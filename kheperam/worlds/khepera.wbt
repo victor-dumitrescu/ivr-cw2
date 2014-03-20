@@ -591,7 +591,8 @@ DEF KHEPERA DifferentialWheels {
       }
     ]
   }
-  controller "matlabcontrol"
+  # controller "matlabcontrol"
+  controller "test_controller"
   synchronization FALSE
   axleLength 0.053
   wheelRadius 0.008
