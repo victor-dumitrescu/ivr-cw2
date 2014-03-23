@@ -48,7 +48,7 @@ DEF ground Solid {
         }
       }
       geometry DEF PLANE Plane {
-        size 1.5 0.16
+        size 1.5 0.3
       }
     }
   ]
@@ -64,7 +64,7 @@ Solid {
         }
       }
       geometry Box {
-        size 0.02 0.02 0.2
+        size 0.02 0.02 0.3
       }
     }
   ]
@@ -78,7 +78,7 @@ Solid {
   boundingObject USE WALL_SHAPE
 }
 Solid {
-  translation 0 0.01 0.09
+  translation 0 0.01 0.14
   rotation 0 1 0 1.5708
   children [
     DEF WALL_SHAPE_L Shape {
@@ -95,7 +95,7 @@ Solid {
   boundingObject USE WALL_SHAPE_L
 }
 Solid {
-  translation 0 0.01 -0.09
+  translation 0 0.01 -0.14
   rotation 0 1 0 1.5708
   children [
     USE WALL_SHAPE_L
@@ -103,8 +103,8 @@ Solid {
   boundingObject USE WALL_SHAPE_L
 }
 DEF KHEPERA DifferentialWheels {
-  translation 0.7 0 0
-  rotation 0 1 0 1.06105
+  translation 0.7 0 0.09
+  rotation 0 1 0 0
   children [
     Shape {
       appearance Appearance {
