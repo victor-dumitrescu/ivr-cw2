@@ -104,7 +104,7 @@ Solid {
 }
 DEF KHEPERA DifferentialWheels {
   translation 0.7 0 0.09
-  rotation 0 1 0 0
+  rotation 0 1 0 0.5
   children [
     Shape {
       appearance Appearance {
