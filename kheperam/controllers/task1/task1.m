@@ -1,16 +1,3 @@
-% Very simple MATLAB controller for Webots
-% File: matlabcontrol.m
-% Date: 21/09/2011          
-% Description: This controller will open MATLAB and let you input
-%              commands from the keyboard
-% Author: Simon Smith (artificialsimon@ed.ac.uk)        
-% Modifications: 
-% Use: command to set motor speed 1 to left motor, -1 to right motor
-%       wb_differential_wheels_set_speed(1, -1)
-% After sending a setting command, the controller have to resume by
-% sending "return" in the keyboard input
-% This will allow a sensor value update as well
-
 TIME_STEP = 64;
 N = 8;
 
@@ -35,7 +22,7 @@ while wb_robot_step(TIME_STEP) ~= -1
            sensor_values(i) = wb_distance_sensor_get_value(ps(i));
        end
   % display all distance sensors values
-       % sensor_values
+       sensor_values
 
   left_speed=1;
   right_speed=1;
