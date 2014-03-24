@@ -9,13 +9,17 @@ TURN_MODE = false;
 
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
-reference = -ones(1, 8);
+reference = -ones(1, N);
 reference(RT) = 400;
 reference(R) = wall_distance;
 
 LEFT = 3;
 RIGHT = 3;
 MAX_SPEED = 10;
+
+% Set up an array to keep a history of errors in order to compute
+% the integral adjustment.
+error_history = zeros(1, N);
 
 % get and enable distance sensors
 for i=1:N
@@ -31,18 +35,15 @@ wb_differential_wheels_set_speed(RIGHT, LEFT);
 
 % Main loop
 while wb_robot_step(TIME_STEP) ~= -1
-
     % Read all distance sensors and calculate errors with respect to
     % reference values for the relevant ones.
-    error_values = zeros(1, 8);
+    error_values = zeros(1, N);
     for i=1:N
         sensor_values(i) = wb_distance_sensor_get_value(ps(i));
         if reference(i) ~= -1 
             error_values(i) = sensor_values(i) - reference(i);
         end
     end
-    % error_values
-
     % Avoid walls and other obstacles in front by stopping and turning until
     % the way ahead is clear. This should also preserve the lateral distance
     % to the walls.
@@ -56,9 +57,17 @@ while wb_robot_step(TIME_STEP) ~= -1
         end
     else
         % Compute PID adjustments and add them to the default speeds of the motors.
-        [add_right, add_left] = p_component(error_values, reference);
+        % P component
+        [add_right, add_left] = p_component(error_values);
         right_speed = RIGHT + add_right;
         left_speed = LEFT + add_left;
+
+        % I component
+        [add_right, add_left, error_history] = ...
+                        i_component(error_values, error_history);
+
+        right_speed = right_speed + add_right;
+        left_speed = left_speed + add_left;
     end
 
     % Cap speeds in order to avoid erratic movements.

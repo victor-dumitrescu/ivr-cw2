@@ -1,4 +1,4 @@
-function [add_right, add_left] = p_component (error_values, reference)
+function [add_right, add_left] = p_component (error_values)
     % Proportional component of the PID controller.
     P_GAIN = [0 0 0 0 0.08 0.08 0 0];
 
