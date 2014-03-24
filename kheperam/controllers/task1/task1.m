@@ -1,9 +1,11 @@
 TIME_STEP = 64;
 N = 8;
 
+LT = 2; % top-left sensor
 RT = 5; % top-right sensor
 R = 6; % rightmost sensor
-wall_distance = 700; 
+wall_distance = 700;
+corner_distance = 850;
 
 TURN_MODE = false;
 
@@ -47,12 +49,15 @@ while wb_robot_step(TIME_STEP) ~= -1
     % Avoid walls and other obstacles in front by stopping and turning until
     % the way ahead is clear. This should also preserve the lateral distance
     % to the walls.
-    if TURN_MODE || (min(sensor_values(3:4)) > wall_distance)
+    if TURN_MODE || (min(sensor_values(3:4)) > wall_distance) || ...
+                     (sensor_values(RT) > corner_distance) || ...
+                     (sensor_values(LT) > corner_distance)
         % Turn mode will be active until front sensors no longer detect an obstacle.
         TURN_MODE = true;
         right_speed = -RIGHT;
         left_speed = LEFT;
-        if ~any(sensor_values(3:4))
+        if ~any(sensor_values(3:4)) && sensor_values(RT) && ...
+            sensor_values(LT)
             TURN_MODE = false;
         end
     else
