@@ -13,8 +13,9 @@ reference = -ones(1, 8);
 reference(RT) = 400;
 reference(R) = wall_distance;
 
-LEFT = 1;
-RIGHT = 1;
+LEFT = 3;
+RIGHT = 3;
+MAX_SPEED = 10;
 
 % get and enable distance sensors
 for i=1:N
@@ -26,7 +27,7 @@ end
 % desktop;
 
 % Initially set the robot in motion.
-wb_differential_wheels_set_speed(1, 1);
+wb_differential_wheels_set_speed(RIGHT, LEFT);
 
 % Main loop
 while wb_robot_step(TIME_STEP) ~= -1
@@ -48,8 +49,8 @@ while wb_robot_step(TIME_STEP) ~= -1
     if TURN_MODE || (min(sensor_values(3:4)) > wall_distance)
         % Turn mode will be active until front sensors no longer detect an obstacle.
         TURN_MODE = true;
-        right_speed = -1;
-        left_speed = 1;
+        right_speed = -RIGHT;
+        left_speed = LEFT;
         if ~any(sensor_values(3:4))
             TURN_MODE = false;
         end
@@ -61,10 +62,10 @@ while wb_robot_step(TIME_STEP) ~= -1
     end
 
     % Cap speeds in order to avoid erratic movements.
-    right_speed = max(-5, right_speed);
-    right_speed = min(5, right_speed);
-    left_speed = max(-5, left_speed);
-    left_speed = min(5, left_speed);
+    right_speed = max(-MAX_SPEED, right_speed);
+    right_speed = min(MAX_SPEED, right_speed);
+    left_speed = max(-MAX_SPEED, left_speed);
+    left_speed = min(MAX_SPEED, left_speed);
 
     disp([right_speed, left_speed]);
     wb_differential_wheels_set_speed(right_speed, left_speed);
