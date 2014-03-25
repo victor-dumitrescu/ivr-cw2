@@ -7,9 +7,9 @@ R = 6; % rightmost sensor
 L = 1; % leftmost sensor
 
 wall_distance = 700;
-corner_max = 800;
-wall_min = 800;
-wall_max = 900;
+corner_max = 700;
+wall_min = 850;
+wall_max = 850;
 
 turn_mode = false;
 obstacle_mode = false;
@@ -63,7 +63,8 @@ while wb_robot_step(TIME_STEP) ~= -1
         right_speed = -RIGHT;
         left_speed = LEFT;
 
-        if ~any(sensor_values(3:4)) || ~sensor_values(RT) && ~sensor_values(LT) || ...
+        if ~any(sensor_values(3:4)) || ...
+            (sensor_values(RT) < corner_max) || (sensor_values(LT) < corner_max) || ...
             (sensor_values(R) < wall_max) || (sensor_values(L) < wall_max)
         
             turn_mode = false;
