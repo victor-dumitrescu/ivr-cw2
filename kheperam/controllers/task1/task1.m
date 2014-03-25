@@ -4,10 +4,15 @@ N = 8;
 LT = 2; % top-left sensor
 RT = 5; % top-right sensor
 R = 6; % rightmost sensor
-wall_distance = 700;
-corner_distance = 850;
+L = 1; % leftmost sensor
 
-TURN_MODE = false;
+wall_distance = 700;
+corner_max = 800;
+wall_min = 800;
+wall_max = 900;
+
+turn_mode = false;
+obstacle_mode = false;
 
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
@@ -49,17 +54,21 @@ while wb_robot_step(TIME_STEP) ~= -1
     % Avoid walls and other obstacles in front by stopping and turning until
     % the way ahead is clear. This should also preserve the lateral distance
     % to the walls.
-    if TURN_MODE || (min(sensor_values(3:4)) > wall_distance) || ...
-                     (sensor_values(RT) > corner_distance) || ...
-                     (sensor_values(LT) > corner_distance)
-        % Turn mode will be active until front sensors no longer detect an obstacle.
-        TURN_MODE = true;
+    if turn_mode || (any(sensor_values(3:4) > wall_distance)) || ...
+       (sensor_values(RT) > corner_max) || (sensor_values(LT) > corner_max) || ...
+       (sensor_values(R) > wall_min) || (sensor_values(L) > wall_min)
+        
+        turn_mode = true;
+
         right_speed = -RIGHT;
         left_speed = LEFT;
-        if ~any(sensor_values(3:4)) && sensor_values(RT) && ...
-            sensor_values(LT)
-            TURN_MODE = false;
+
+        if ~any(sensor_values(3:4)) || ~sensor_values(RT) && ~sensor_values(LT) || ...
+            (sensor_values(R) < wall_max) || (sensor_values(L) < wall_max)
+        
+            turn_mode = false;
         end
+        
     else
         % Compute PID adjustments and add them to the default speeds of the motors.
         % P component
