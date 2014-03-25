@@ -72,7 +72,7 @@ while wb_robot_step(TIME_STEP) ~= -1
         
             turn_mode = false;
         end
-        
+
     else
         % Compute PID adjustments and add them to the default speeds of the motors.
         % P component
