@@ -51,6 +51,7 @@ while wb_robot_step(TIME_STEP) ~= -1
             error_values(i) = sensor_values(i) - reference(i);
         end
     end
+
     % Avoid walls and other obstacles in front by stopping and turning until
     % the way ahead is clear. This should also preserve the lateral distance
     % to the walls.
@@ -63,9 +64,9 @@ while wb_robot_step(TIME_STEP) ~= -1
         right_speed = -RIGHT;
         left_speed = LEFT;
 
-        if ~any(sensor_values(3:4)) || ...
-            (sensor_values(RT) < corner_max) || (sensor_values(LT) < corner_max) || ...
-            (sensor_values(R) < wall_max) || (sensor_values(L) < wall_max)
+        if ~any(sensor_values(3:4)) && ...
+            (sensor_values(RT) < corner_max) && (sensor_values(LT) < corner_max) && ...
+            (sensor_values(R) < wall_max) && (sensor_values(L) < wall_max)
         
             turn_mode = false;
         end
