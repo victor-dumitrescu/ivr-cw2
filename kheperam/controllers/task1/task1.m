@@ -1,13 +1,22 @@
-TIME_STEP = 128;
+TIME_STEP = 64;
 N = 8;
 
 LT = 2; % top-left sensor
 RT = 5; % top-right sensor
 R = 6; % rightmost sensor
-wall_distance = 700;
-corner_distance = 700;
+L = 1; % leftmost sensor
 
-TURN_MODE = false;
+wall_distance = 700;
+corner_max = 800;
+wall_min = 800;
+wall_max = 900;
+
+x_dist = 0;
+y_dist = 0;
+theta = 0;
+
+turn_mode = false;
+obstacle_mode = false;
 
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
@@ -47,10 +56,23 @@ while wb_robot_step(TIME_STEP) ~= -1
         end
     end
     % Avoid walls and other obstacles in front by stopping and turning until
-    % the way ahead is clear.
-    if sensor_values(4) > corner_distance || sensor_values(R) > 750
+    % the way ahead is clear. This should also preserve the lateral distance
+    % to the walls.
+    if turn_mode || (any(sensor_values(3:4) > wall_distance)) || ...
+       (sensor_values(RT) > corner_max) || (sensor_values(LT) > corner_max) || ...
+       (sensor_values(R) > wall_min) || (sensor_values(L) > wall_min)
+        
+        turn_mode = true;
+
         right_speed = -RIGHT;
         left_speed = LEFT;
+
+        if ~any(sensor_values(3:4)) || ~sensor_values(RT) && ~sensor_values(LT) || ...
+            (sensor_values(R) < wall_max) || (sensor_values(L) < wall_max)
+        
+            turn_mode = false;
+        end
+        
     else
         % Compute PID adjustments and add them to the default speeds of the motors.
         % P component
@@ -72,9 +94,14 @@ while wb_robot_step(TIME_STEP) ~= -1
     left_speed = max(-MAX_SPEED, left_speed);
     left_speed = min(MAX_SPEED, left_speed);
 
-    disp([right_speed, left_speed]);
+    %disp([right_speed, left_speed]);
     wb_differential_wheels_set_speed(right_speed, left_speed);
-
-    %control goes to the keyboard
-    %keyboard;
+    x_dist = x_dist + 0.5 * (left_speed + right_speed) * cos(theta);
+    y_dist = y_dist + 0.5 * (left_speed + right_speed) * sin(theta);
+    theta = theta - 0.5 * (left_speed - right_speed)/(2 * 6*4.25);
+    if sqrt(x_dist^2 + y_dist^2) < 50
+        x_dist
+        y_dist
+        theta
+    end
 end

@@ -1,7 +1,7 @@
 function [add_right, add_left, new_error_history] = ...
          i_component (error_values, error_history)
     % Integral component of the PID controller.
-    I_GAIN = [0 0 0 0 0.001 0.001 0 0];
+    I_GAIN = [0 0 0 0 0.0001 0.0001 0 0];
     epsilon = 10 * ones(1,8);
 
     if all(abs(error_values) < epsilon)
@@ -17,9 +17,9 @@ function [add_right, add_left, new_error_history] = ...
 
         for i=1:8
             if new_error_history(i) > 0
-                add_left = add_left + I_GAIN(i) * new_error_history(i);
+                add_left = add_left + new_error_history(i);
             else
-                add_right = add_right - I_GAIN(i) * new_error_history(i);
+                add_right = add_right - new_error_history(i);
             end
     end
 
