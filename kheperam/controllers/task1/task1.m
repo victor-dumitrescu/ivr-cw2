@@ -106,7 +106,7 @@ while wb_robot_step(TIME_STEP) ~= -1 && should_run
     if sqrt(x_dist^2 + y_dist^2) > 500
         away_from_beginning = true;
     end
-    if sqrt(x_dist^2 + y_dist^2) < 100 && away_from_beginning
+    if sqrt(x_dist^2 + y_dist^2) < 40 && away_from_beginning
         should_run = false;
         disp('Done!');
     end
