@@ -17,6 +17,8 @@ theta = 0;
 
 turn_mode = false;
 obstacle_mode = false;
+should_run = true;
+away_from_beginning = false;
 
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
@@ -45,7 +47,7 @@ end
 wb_differential_wheels_set_speed(RIGHT, LEFT);
 
 % Main loop
-while wb_robot_step(TIME_STEP) ~= -1
+while wb_robot_step(TIME_STEP) ~= -1 && should_run
     % Read all distance sensors and calculate errors with respect to
     % reference values for the relevant ones.
     error_values = zeros(1, N);
@@ -98,10 +100,13 @@ while wb_robot_step(TIME_STEP) ~= -1
     wb_differential_wheels_set_speed(right_speed, left_speed);
     x_dist = x_dist + 0.5 * (left_speed + right_speed) * cos(theta);
     y_dist = y_dist + 0.5 * (left_speed + right_speed) * sin(theta);
-    theta = theta - 0.5 * (left_speed - right_speed)/(2 * 6*4.25);
-    if sqrt(x_dist^2 + y_dist^2) < 50
-        x_dist
-        y_dist
-        theta
+    theta = theta - 0.5 * (left_speed - right_speed)/(2 * 6*4.3);
+    %disp(theta);
+    if sqrt(x_dist^2 + y_dist^2) > 500
+        away_from_beginning = true;
+    end
+    if sqrt(x_dist^2 + y_dist^2) < 100 && away_from_beginning
+        should_run = false;
+        disp('Done!');
     end
 end
