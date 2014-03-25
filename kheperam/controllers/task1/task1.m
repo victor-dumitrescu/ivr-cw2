@@ -1,11 +1,11 @@
-TIME_STEP = 64;
+TIME_STEP = 128;
 N = 8;
 
 LT = 2; % top-left sensor
 RT = 5; % top-right sensor
 R = 6; % rightmost sensor
 wall_distance = 700;
-corner_distance = 850;
+corner_distance = 700;
 
 TURN_MODE = false;
 
@@ -47,19 +47,10 @@ while wb_robot_step(TIME_STEP) ~= -1
         end
     end
     % Avoid walls and other obstacles in front by stopping and turning until
-    % the way ahead is clear. This should also preserve the lateral distance
-    % to the walls.
-    if TURN_MODE || (min(sensor_values(3:4)) > wall_distance) || ...
-                     (sensor_values(RT) > corner_distance) || ...
-                     (sensor_values(LT) > corner_distance)
-        % Turn mode will be active until front sensors no longer detect an obstacle.
-        TURN_MODE = true;
+    % the way ahead is clear.
+    if sensor_values(4) > corner_distance || sensor_values(R) > 750
         right_speed = -RIGHT;
         left_speed = LEFT;
-        if ~any(sensor_values(3:4)) && sensor_values(RT) && ...
-            sensor_values(LT)
-            TURN_MODE = false;
-        end
     else
         % Compute PID adjustments and add them to the default speeds of the motors.
         % P component
