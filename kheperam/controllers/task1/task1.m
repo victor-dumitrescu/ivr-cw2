@@ -6,10 +6,10 @@ RT = 5; % top-right sensor
 R = 6; % rightmost sensor
 L = 1; % leftmost sensor
 
-wall_distance = 700;
+wall_distance = 680;
 corner_max = 700;
-wall_min = 850;
-wall_max = 850;
+wall_min = 870;
+wall_max = 600;
 
 x_dist = 0;
 y_dist = 0;
@@ -23,7 +23,7 @@ away_from_beginning = false;
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
 reference = -ones(1, N);
-reference(RT) = 400;
+reference(RT) = 380;
 reference(R) = wall_distance;
 
 LEFT = 3;
@@ -70,11 +70,19 @@ while wb_robot_step(TIME_STEP) ~= -1 && should_run
         right_speed = -RIGHT;
         left_speed = LEFT;
 
-        if ~any(sensor_values(3:4)) && ...
-            (sensor_values(RT) < corner_max) && (sensor_values(LT) < corner_max) && ...
-            (sensor_values(R) < wall_max) && (sensor_values(L) < wall_max)
-        
-            turn_mode = false;
+        if ~any(sensor_values(3:4)) 
+            if (sensor_values(RT) < corner_max) && (sensor_values(LT) < corner_max)
+                if  (sensor_values(R) < wall_max) && (sensor_values(L) < wall_max)
+                    turn_mode = false;
+                end
+            elseif (sensor_values(R) < wall_min) && (sensor_values(L) < wall_min)
+                turn_mode = false;
+                
+            end
+            % (((sensor_values(RT) < corner_max) && (sensor_values(LT) < corner_max) && ...
+            % (sensor_values(R) < wall_max) && (sensor_values(L) < wall_max)) || ...
+            % ((sensor_values(R) < wall_min) && (sensor_values(L) < wall_min)))
+            % turn_mode = false;
         end
 
     else
