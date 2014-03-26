@@ -79,10 +79,6 @@ while wb_robot_step(TIME_STEP) ~= -1 && should_run
                 turn_mode = false;
                 
             end
-            % (((sensor_values(RT) < corner_max) && (sensor_values(LT) < corner_max) && ...
-            % (sensor_values(R) < wall_max) && (sensor_values(L) < wall_max)) || ...
-            % ((sensor_values(R) < wall_min) && (sensor_values(L) < wall_min)))
-            % turn_mode = false;
         end
 
     else
@@ -110,12 +106,13 @@ while wb_robot_step(TIME_STEP) ~= -1 && should_run
     wb_differential_wheels_set_speed(right_speed, left_speed);
     x_dist = x_dist + 0.5 * (left_speed + right_speed) * cos(theta);
     y_dist = y_dist + 0.5 * (left_speed + right_speed) * sin(theta);
-    theta = theta - 0.5 * (left_speed - right_speed)/(2 * 6*4.3);
+    theta = theta - 0.5 * (left_speed - right_speed)/(2 * 25.2);
     %disp(theta);
+    disp([x_dist y_dist theta]);
     if sqrt(x_dist^2 + y_dist^2) > 500
         away_from_beginning = true;
     end
-    if sqrt(x_dist^2 + y_dist^2) < 40 && away_from_beginning
+    if sqrt(x_dist^2 + y_dist^2) < 300 && away_from_beginning
         should_run = false;
         disp('Done!');
     end
