@@ -34,6 +34,9 @@ LEFT = 3;
 RIGHT = 3;
 MAX_SPEED = 10;
 
+wb_differential_wheels_enable_encoders(TIME_STEP);
+wb_differential_wheels_set_encoders(0, 0);
+
 % Set up an array to keep a history of errors in order to compute
 % the integral adjustment.
 error_history = zeros(1, N);
@@ -43,11 +46,6 @@ for i=1:N
     ps(i) = wb_robot_get_device(['ds' int2str(i-1)]);
     wb_distance_sensor_enable(ps(i),TIME_STEP);
 end
-
-% Initially set the robot in motion.
-wb_differential_wheels_set_speed(RIGHT, LEFT);
-wb_differential_wheels_enable_encoders(TIME_STEP);
-wb_differential_wheels_set_encoders(0, 0);
 
 % Main loop
 while (wb_robot_step(TIME_STEP) ~= -1) & should_run
@@ -61,14 +59,15 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             error_values(i) = sensor_values(i) - reference(i);
         end
     end
-
-    if ~any(sensor_values(3:6)) && ~wall_found
+    % If we haven't reached any wall at all:
+    if ~any(sensor_values(3:6) > wall_distance) && ~wall_found
         % While there is no wall in front or to the right, simply go straight.
         right_speed = RIGHT;
         left_speed = LEFT;
-
+    % If we are near a wall:
     else
         wall_found = true;
+        % If we need to turn:
         if turn_mode || (any(sensor_values(3:4) > wall_distance-40)) || ...
            (sensor_values(RT) > corner_max) || (sensor_values(R) > wall_min)
             % Avoid walls and other obstacles in front by stopping and turning until
@@ -89,14 +88,13 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
                     turn_mode = false;
                 end
             end
-
+        % Else we just follow the wall:
         else
             % Compute PID adjustments and add them to the default speeds of the motors.
             % P component
             [add_right, add_left] = p_component(error_values);
             right_speed = RIGHT + add_right;
             left_speed = LEFT + add_left;
-
             % I component
             [add_right, add_left, error_history] = ...
                             i_component(error_values, error_history);
@@ -105,7 +103,6 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         end
         left_enc = wb_differential_wheels_get_left_encoder();
         right_enc = wb_differential_wheels_get_right_encoder();
-        wb_differential_wheels_set_encoders(0, 0);
 
         x_dist = x_dist + 0.5 * (left_enc + right_enc) * cos(theta);
         y_dist = y_dist + 0.5 * (left_enc + right_enc) * sin(theta);
@@ -116,18 +113,17 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         end
         if sqrt(x_dist^2 + y_dist^2) < 200 & away_from_beginning
             should_run = false;
-            wb_differential_wheels_set_speed(0, 0);
+            right_speed = 0;
+            left_speed = 0;
             disp('Done!');
         end
     end
-
     % Cap speeds in order to avoid erratic movements.
     right_speed = max(-MAX_SPEED, right_speed);
     right_speed = min(MAX_SPEED, right_speed);
     left_speed = max(-MAX_SPEED, left_speed);
     left_speed = min(MAX_SPEED, left_speed);
-
     %disp([right_speed, left_speed]);
     wb_differential_wheels_set_speed(right_speed, left_speed);
-
+    wb_differential_wheels_set_encoders(0, 0);
 end
