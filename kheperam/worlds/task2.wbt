@@ -9,8 +9,8 @@ WorldInfo {
   runRealTime TRUE
 }
 Viewpoint {
-  orientation -0.678678 -0.620403 -0.393061 1.77468
-  position -0.498636 1.63806 -0.00556726
+  orientation -0.541555 -0.704683 -0.458411 1.99587
+  position -0.418822 0.622694 0.257636
 }
 PointLight {
   ambientIntensity 0.5
@@ -210,7 +210,7 @@ Solid {
 }
 DEF KHEPERA DifferentialWheels {
   translation -0.3 0 0.28
-  rotation 0 1 0 1.06105
+  rotation 0 1 0 4.1
   children [
     Shape {
       appearance Appearance {

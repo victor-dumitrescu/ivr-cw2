@@ -1,4 +1,4 @@
-TIME_STEP = 64;
+TIME_STEP = 128;
 N = 8;
 
 LT = 2; % top-left sensor
@@ -6,17 +6,19 @@ RT = 5; % top-right sensor
 R = 6; % rightmost sensor
 L = 1; % leftmost sensor
 
+% Parameters used for obstacle detection
 wall_distance = 680;
-corner_max = 700;
-wall_min = 870;
+corner_max = 720;
+wall_min = 700;
 wall_max = 600;
 
+% Internal position tracking variables
 x_dist = 0;
 y_dist = 0;
 theta = 0;
 
+% State variables
 turn_mode = false;
-obstacle_mode = false;
 should_run = true;
 away_from_beginning = false;
 
@@ -26,6 +28,7 @@ reference = -ones(1, N);
 reference(RT) = 380;
 reference(R) = wall_distance;
 
+% Base and maximum speeds
 LEFT = 3;
 RIGHT = 3;
 MAX_SPEED = 10;
@@ -34,14 +37,11 @@ MAX_SPEED = 10;
 % the integral adjustment.
 error_history = zeros(1, N);
 
-% get and enable distance sensors
+% Get and enable distance sensors
 for i=1:N
     ps(i) = wb_robot_get_device(['ds' int2str(i-1)]);
     wb_distance_sensor_enable(ps(i),TIME_STEP);
 end
-
-% Calling MATLAB desktop version
-% desktop;
 
 % Initially set the robot in motion.
 wb_differential_wheels_set_speed(RIGHT, LEFT);
@@ -50,9 +50,9 @@ wb_differential_wheels_set_encoders(0, 0);
 
 % Main loop
 while (wb_robot_step(TIME_STEP) ~= -1) & should_run
+    
     % Read all distance sensors and calculate errors with respect to
     % reference values for the relevant ones.
-
     error_values = zeros(1, N);
     for i=1:N
         sensor_values(i) = wb_distance_sensor_get_value(ps(i));
@@ -64,9 +64,8 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
     % Avoid walls and other obstacles in front by stopping and turning until
     % the way ahead is clear. This should also preserve the lateral distance
     % to the walls.
-    if turn_mode || (any(sensor_values(3:4) > wall_distance)) || ...
-       (sensor_values(RT) > corner_max) || (sensor_values(LT) > corner_max) || ...
-       (sensor_values(R) > wall_min) || (sensor_values(L) > wall_min)
+    if turn_mode || (any(sensor_values(3:4) > wall_distance-40)) || ...
+       (sensor_values(RT) > corner_max) || (sensor_values(R) > wall_min)
         
         turn_mode = true;
 
@@ -74,13 +73,12 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         left_speed = LEFT;
 
         if ~any(sensor_values(3:4)) 
-            if (sensor_values(RT) < corner_max) && (sensor_values(LT) < corner_max)
-                if  (sensor_values(R) < wall_max) && (sensor_values(L) < wall_max)
+            if sensor_values(RT) < corner_max
+                if sensor_values(R) < wall_min
                     turn_mode = false;
                 end
-            elseif (sensor_values(R) < wall_min) && (sensor_values(L) < wall_min)
+            elseif sensor_values(R) < wall_max
                 turn_mode = false;
-                
             end
         end
 
@@ -94,7 +92,6 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         % I component
         [add_right, add_left, error_history] = ...
                         i_component(error_values, error_history);
-
         right_speed = right_speed + add_right;
         left_speed = left_speed + add_left;
     end
