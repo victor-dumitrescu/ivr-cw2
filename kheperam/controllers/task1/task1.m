@@ -45,11 +45,14 @@ end
 
 % Initially set the robot in motion.
 wb_differential_wheels_set_speed(RIGHT, LEFT);
+wb_differential_wheels_enable_encoders(TIME_STEP);
+wb_differential_wheels_set_encoders(0, 0);
 
 % Main loop
-while wb_robot_step(TIME_STEP) ~= -1 && should_run
+while (wb_robot_step(TIME_STEP) ~= -1) & should_run
     % Read all distance sensors and calculate errors with respect to
     % reference values for the relevant ones.
+
     error_values = zeros(1, N);
     for i=1:N
         sensor_values(i) = wb_distance_sensor_get_value(ps(i));
@@ -104,16 +107,21 @@ while wb_robot_step(TIME_STEP) ~= -1 && should_run
 
     %disp([right_speed, left_speed]);
     wb_differential_wheels_set_speed(right_speed, left_speed);
-    x_dist = x_dist + 0.5 * (left_speed + right_speed) * cos(theta);
-    y_dist = y_dist + 0.5 * (left_speed + right_speed) * sin(theta);
-    theta = theta - 0.5 * (left_speed - right_speed)/(2 * 25.2);
-    %disp(theta);
-    disp([x_dist y_dist theta]);
+
+    left_enc = wb_differential_wheels_get_left_encoder();
+    right_enc = wb_differential_wheels_get_right_encoder();
+    wb_differential_wheels_set_encoders(0, 0);
+
+    x_dist = x_dist + 0.5 * (left_enc + right_enc) * cos(theta);
+    y_dist = y_dist + 0.5 * (left_enc + right_enc) * sin(theta);
+    theta = theta - 0.5 * (left_enc - right_enc)/(2 * 5.2 * 32);
+
     if sqrt(x_dist^2 + y_dist^2) > 500
         away_from_beginning = true;
     end
-    if sqrt(x_dist^2 + y_dist^2) < 300 && away_from_beginning
+    if sqrt(x_dist^2 + y_dist^2) < 200 & away_from_beginning
         should_run = false;
+        wb_differential_wheels_set_speed(0, 0);
         disp('Done!');
     end
 end
