@@ -51,13 +51,13 @@ wb_differential_wheels_set_encoders(0, 0);
 
 % Main loop
 while (wb_robot_step(TIME_STEP) ~= -1) & should_run
-    
+
     % Read all distance sensors and calculate errors with respect to
     % reference values for the relevant ones.
     error_values = zeros(1, N);
     for i=1:N
         sensor_values(i) = wb_distance_sensor_get_value(ps(i));
-        if reference(i) ~= -1 
+        if reference(i) ~= -1
             error_values(i) = sensor_values(i) - reference(i);
         end
     end
@@ -74,13 +74,13 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             % Avoid walls and other obstacles in front by stopping and turning until
             % the way ahead is clear. This should also preserve the lateral distance
             % to the walls.
-            
+
             turn_mode = true;
 
             right_speed = -RIGHT;
             left_speed = LEFT;
 
-            if ~any(sensor_values(3:4)) 
+            if ~any(sensor_values(3:4))
                 if sensor_values(RT) < corner_max
                     if sensor_values(R) < wall_min
                         turn_mode = false;
@@ -103,6 +103,22 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             right_speed = right_speed + add_right;
             left_speed = left_speed + add_left;
         end
+        left_enc = wb_differential_wheels_get_left_encoder();
+        right_enc = wb_differential_wheels_get_right_encoder();
+        wb_differential_wheels_set_encoders(0, 0);
+
+        x_dist = x_dist + 0.5 * (left_enc + right_enc) * cos(theta);
+        y_dist = y_dist + 0.5 * (left_enc + right_enc) * sin(theta);
+        theta = theta - 0.5 * (left_enc - right_enc)/(2 * 5.2 * 32);
+
+        if sqrt(x_dist^2 + y_dist^2) > 500
+            away_from_beginning = true;
+        end
+        if sqrt(x_dist^2 + y_dist^2) < 200 & away_from_beginning
+            should_run = false;
+            wb_differential_wheels_set_speed(0, 0);
+            disp('Done!');
+        end
     end
 
     % Cap speeds in order to avoid erratic movements.
@@ -114,20 +130,4 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
     %disp([right_speed, left_speed]);
     wb_differential_wheels_set_speed(right_speed, left_speed);
 
-    left_enc = wb_differential_wheels_get_left_encoder();
-    right_enc = wb_differential_wheels_get_right_encoder();
-    wb_differential_wheels_set_encoders(0, 0);
-
-    x_dist = x_dist + 0.5 * (left_enc + right_enc) * cos(theta);
-    y_dist = y_dist + 0.5 * (left_enc + right_enc) * sin(theta);
-    theta = theta - 0.5 * (left_enc - right_enc)/(2 * 5.2 * 32);
-
-    if sqrt(x_dist^2 + y_dist^2) > 500
-        away_from_beginning = true;
-    end
-    if sqrt(x_dist^2 + y_dist^2) < 200 & away_from_beginning
-        should_run = false;
-        wb_differential_wheels_set_speed(0, 0);
-        disp('Done!');
-    end
 end
