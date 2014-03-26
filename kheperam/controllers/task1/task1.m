@@ -108,6 +108,8 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         y_dist = y_dist + 0.5 * (left_enc + right_enc) * sin(theta);
         theta = theta - 0.5 * (left_enc - right_enc)/(2 * 5.2 * 32);
 
+        disp([x_dist y_dist] ./100)
+
         if sqrt(x_dist^2 + y_dist^2) > 500
             away_from_beginning = true;
         end
