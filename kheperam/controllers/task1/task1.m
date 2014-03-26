@@ -21,6 +21,7 @@ theta = 0;
 turn_mode = false;
 should_run = true;
 away_from_beginning = false;
+wall_found = false;
 
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
@@ -61,39 +62,47 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         end
     end
 
-    % Avoid walls and other obstacles in front by stopping and turning until
-    % the way ahead is clear. This should also preserve the lateral distance
-    % to the walls.
-    if turn_mode || (any(sensor_values(3:4) > wall_distance-40)) || ...
-       (sensor_values(RT) > corner_max) || (sensor_values(R) > wall_min)
-        
-        turn_mode = true;
-
-        right_speed = -RIGHT;
+    if ~any(sensor_values(3:6)) && ~wall_found
+        % While there is no wall in front or to the right, simply go straight.
+        right_speed = RIGHT;
         left_speed = LEFT;
 
-        if ~any(sensor_values(3:4)) 
-            if sensor_values(RT) < corner_max
-                if sensor_values(R) < wall_min
+    else
+        wall_found = true;
+        if turn_mode || (any(sensor_values(3:4) > wall_distance-40)) || ...
+           (sensor_values(RT) > corner_max) || (sensor_values(R) > wall_min)
+            % Avoid walls and other obstacles in front by stopping and turning until
+            % the way ahead is clear. This should also preserve the lateral distance
+            % to the walls.
+            
+            turn_mode = true;
+
+            right_speed = -RIGHT;
+            left_speed = LEFT;
+
+            if ~any(sensor_values(3:4)) 
+                if sensor_values(RT) < corner_max
+                    if sensor_values(R) < wall_min
+                        turn_mode = false;
+                    end
+                elseif sensor_values(R) < wall_max
                     turn_mode = false;
                 end
-            elseif sensor_values(R) < wall_max
-                turn_mode = false;
             end
+
+        else
+            % Compute PID adjustments and add them to the default speeds of the motors.
+            % P component
+            [add_right, add_left] = p_component(error_values);
+            right_speed = RIGHT + add_right;
+            left_speed = LEFT + add_left;
+
+            % I component
+            [add_right, add_left, error_history] = ...
+                            i_component(error_values, error_history);
+            right_speed = right_speed + add_right;
+            left_speed = left_speed + add_left;
         end
-
-    else
-        % Compute PID adjustments and add them to the default speeds of the motors.
-        % P component
-        [add_right, add_left] = p_component(error_values);
-        right_speed = RIGHT + add_right;
-        left_speed = LEFT + add_left;
-
-        % I component
-        [add_right, add_left, error_history] = ...
-                        i_component(error_values, error_history);
-        right_speed = right_speed + add_right;
-        left_speed = left_speed + add_left;
     end
 
     % Cap speeds in order to avoid erratic movements.

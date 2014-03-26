@@ -209,7 +209,7 @@ Solid {
   boundingObject USE WALL_SHAPE_L
 }
 DEF KHEPERA DifferentialWheels {
-  translation -0.3 0 0.28
+  translation -0.3 0 0.21
   rotation 0 1 0 4.1
   children [
     Shape {

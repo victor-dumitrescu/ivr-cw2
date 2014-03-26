@@ -1,3 +1,3 @@
 *.m~
 *.wbt.project
-*.wbt~
+*.wbt~*
