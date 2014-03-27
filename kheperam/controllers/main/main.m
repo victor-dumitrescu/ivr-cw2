@@ -9,10 +9,10 @@ R = 6; % rightmost sensor
 L = 1; % leftmost sensor
 
 % Parameters used for obstacle detection
-WALL_DISTANCE = 680;
+WALL_DISTANCE = 680/1.5;
 CORNER_MAX = 720;
 WALL_MIN = 700;
-WALL_MAX = 600;
+WALL_MAX = 600/1.5;
 
 % Internal position tracking variables
 x_dist = 0;
@@ -28,13 +28,13 @@ wall_found = false;
 % These 2 sensors should have a reference value if we are to follow
 % a wall at constant speed.
 reference = -ones(1, SENSOR_COUNT);
-reference(RT) = 380;
+reference(RT) = 380/1.5;
 reference(R) = WALL_DISTANCE;
 
 % Base and maximum speeds
-LEFT_SPEED = 3;
-RIGHT_SPEED = 3;
-MAX_SPEED = 10;
+LEFT_SPEED = 2;
+RIGHT_SPEED = 2;
+MAX_SPEED = 6;
 
 % Enabling the motor rotation counts:
 wb_differential_wheels_enable_encoders(TIME_STEP);
@@ -71,14 +71,14 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
     else
         wall_found = true;
         % If we need to turn:
-        if turn_mode || (any(sensor_values(3:4) > WALL_DISTANCE-40)) || ...
+        if turn_mode || (any(sensor_values(3:4) > WALL_DISTANCE/2)) || ...
            (sensor_values(RT) > CORNER_MAX) || (sensor_values(R) > WALL_MIN)
             % Avoid walls and other obstacles in front by stopping and turning until
             % the way ahead is clear.
             turn_mode = true;
             right_speed = -RIGHT_SPEED;
             left_speed = LEFT_SPEED;
-            if ~any(sensor_values(3:4))
+            if ~any(sensor_values(3:4) > WALL_DISTANCE)
                 if sensor_values(RT) < CORNER_MAX
                     if sensor_values(R) < WALL_MIN
                         turn_mode = false;
