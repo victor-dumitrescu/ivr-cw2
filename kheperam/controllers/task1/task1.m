@@ -101,19 +101,19 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             right_speed = right_speed + add_right;
             left_speed = left_speed + add_left;
         end
-        left_enc = wb_differential_wheels_get_left_encoder();
-        right_enc = wb_differential_wheels_get_right_encoder();
+        left_enc = 8 * wb_differential_wheels_get_left_encoder()/100;
+        right_enc = 8 * wb_differential_wheels_get_right_encoder()/100;
 
         x_dist = x_dist + 0.5 * (left_enc + right_enc) * cos(theta);
         y_dist = y_dist + 0.5 * (left_enc + right_enc) * sin(theta);
-        theta = theta - 0.5 * (left_enc - right_enc)/(2 * 5.2 * 32);
+        theta = theta - 0.5 * (left_enc - right_enc)/(26.5);
 
         disp([x_dist y_dist] ./100)
 
         if sqrt(x_dist^2 + y_dist^2) > 500
             away_from_beginning = true;
         end
-        if sqrt(x_dist^2 + y_dist^2) < 200 & away_from_beginning
+        if sqrt(x_dist^2 + y_dist^2) < 10 & away_from_beginning
             should_run = false;
             right_speed = 0;
             left_speed = 0;
