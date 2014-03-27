@@ -9,8 +9,8 @@ WorldInfo {
   runRealTime TRUE
 }
 Viewpoint {
-  orientation -0.541555 -0.704683 -0.458411 1.99587
-  position -0.418822 0.622694 0.257636
+  orientation -0.801059 -0.443416 -0.402102 1.96713
+  position 0.0524866 1.61421 -0.236152
 }
 PointLight {
   ambientIntensity 0.5
@@ -48,120 +48,14 @@ DEF ground Solid {
         }
       }
       geometry DEF PLANE Plane {
-        size 0.7 0.7
+        size 1.5 0.3
       }
     }
   ]
   boundingObject USE PLANE
 }
-DEF short_rock_1 Solid {
-  translation -0.1 0.01 0
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 1 1
-        }
-      }
-      geometry DEF short_brick_1_geometry Box {
-        size 0.5 0.02 0.35
-      }
-    }
-  ]
-  name "short brick"
-  boundingObject USE short_brick_1_geometry
-}
-DEF short_rock_h Solid {
-  translation 0.17 0.01 -0.04
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 1 1
-        }
-        texture ImageTexture {
-          url [
-            "textures/stone-2.png"
-          ]
-        }
-      }
-      geometry DEF short_brick_1_geometry Box {
-        size 0.04 0.02 0.08
-      }
-    }
-  ]
-  name "short brick"
-  boundingObject USE short_brick_1_geometry
-}
-DEF short_rock_h Solid {
-  translation -0.168289 0.01 -0.195073
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 1 1
-        }
-        texture ImageTexture {
-          url [
-            "textures/stone-2.png"
-          ]
-        }
-      }
-      geometry DEF short_brick_1_geometry Box {
-        size 0.08 0.02 0.04
-      }
-    }
-  ]
-  name "short brick"
-  boundingObject USE short_brick_1_geometry
-}
-DEF short_rock_1 Solid {
-  translation 0.31 0.01 0.04
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 1 1
-        }
-        texture ImageTexture {
-          url [
-            "textures/stone-2.png"
-          ]
-        }
-      }
-      geometry DEF short_brick_1_geometry Box {
-        size 0.08 0.02 0.08
-      }
-    }
-  ]
-  name "short brick"
-  boundingObject USE short_brick_1_geometry
-}
-DEF short_rock_1 Solid {
-  translation 0.309806 0.01 -0.289492
-  rotation 0 1 0 3.14304
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 1 1
-        }
-        texture ImageTexture {
-          url [
-            "textures/stone-2.png"
-          ]
-        }
-      }
-      geometry DEF short_brick_1_geometry Box {
-        size 0.08 0.02 0.08
-      }
-    }
-  ]
-  name "short brick"
-  boundingObject USE short_brick_1_geometry
-}
 Solid {
-  translation 0.36 0.01 0
+  translation 0.75 0.01 0
   children [
     DEF WALL_SHAPE Shape {
       appearance DEF WALL_APPEARANCE Appearance {
@@ -170,21 +64,21 @@ Solid {
         }
       }
       geometry Box {
-        size 0.02 0.02 0.7
+        size 0.02 0.02 0.3
       }
     }
   ]
   boundingObject USE WALL_SHAPE
 }
 Solid {
-  translation -0.36 0.01 0
+  translation -0.75 0.01 0
   children [
     USE WALL_SHAPE
   ]
   boundingObject USE WALL_SHAPE
 }
 Solid {
-  translation 0 0.01 0.34
+  translation 0 0.01 0.14
   rotation 0 1 0 1.5708
   children [
     DEF WALL_SHAPE_L Shape {
@@ -194,14 +88,14 @@ Solid {
         }
       }
       geometry Box {
-        size 0.02 0.02 0.7
+        size 0.02 0.02 1.5
       }
     }
   ]
   boundingObject USE WALL_SHAPE_L
 }
 Solid {
-  translation 0 0.01 -0.34
+  translation 0 0.01 -0.14
   rotation 0 1 0 1.5708
   children [
     USE WALL_SHAPE_L
@@ -209,8 +103,8 @@ Solid {
   boundingObject USE WALL_SHAPE_L
 }
 DEF KHEPERA DifferentialWheels {
-  translation -0.3 0 0.21
-  rotation 0 1 0 4.1
+  translation 0.7 0 0.09
+  rotation 0 1 0 0.5
   children [
     Shape {
       appearance Appearance {
