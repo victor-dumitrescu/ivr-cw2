@@ -1,7 +1,7 @@
 TIME_STEP = 128;
 SENSOR_COUNT = 8;
 WHEEL_RADIUS = 8;
-ROBOT_DIAMETER = 26.5;
+ROBOT_DIAMETER = 26.5/2;
 
 LT = 2; % top-left sensor
 RT = 5; % top-right sensor
@@ -32,9 +32,9 @@ reference(RT) = 380/1.5;
 reference(R) = WALL_DISTANCE;
 
 % Base and maximum speeds
-LEFT_SPEED = 2;
-RIGHT_SPEED = 2;
-MAX_SPEED = 6;
+LEFT_SPEED = 1;
+RIGHT_SPEED = 1;
+MAX_SPEED = 3;
 
 % Enabling the motor rotation counts:
 wb_differential_wheels_enable_encoders(TIME_STEP);
@@ -76,8 +76,8 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             % Avoid walls and other obstacles in front by stopping and turning until
             % the way ahead is clear.
             turn_mode = true;
-            right_speed = -RIGHT_SPEED;
-            left_speed = LEFT_SPEED;
+            right_speed = -2 * RIGHT_SPEED;
+            left_speed = 2 * LEFT_SPEED;
             if ~any(sensor_values(3:4) > WALL_DISTANCE)
                 if sensor_values(RT) < CORNER_MAX
                     if sensor_values(R) < WALL_MIN
@@ -109,11 +109,12 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         theta = theta - 0.5 * (left_motor_dist - right_motor_dist)/(ROBOT_DIAMETER);
         % We set away_from_beginning to true once we get far from the origin
         % so that we could know when the robot has completed the lap and needs to stop.
-        if sqrt(x_dist^2 + y_dist^2) > 30
+        disp([x_dist, y_dist, theta]);
+        if sqrt(x_dist^2 + y_dist^2) > 20
             away_from_beginning = true;
         end
         % If we are very close to the origin and we're completing the lap:
-        if sqrt(x_dist^2 + y_dist^2) < 10 & away_from_beginning
+        if all([abs(x_dist), abs(y_dist)] < 5) & away_from_beginning
             should_run = false;
             right_speed = 0;
             left_speed = 0;
