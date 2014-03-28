@@ -12,7 +12,7 @@ L = 1; % leftmost sensor
 WALL_DISTANCE = 680;
 CORNER_MAX = 720;
 WALL_MIN = 700;
-WALL_MAX = 600;
+WALL_MAX = 650;
 
 % Internal position tracking variables
 x_dist = 0;
@@ -62,7 +62,7 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             error_values(i) = sensor_values(i) - reference(i);
         end
     end
-    disp(sensor_values(3:6));
+    % disp(sensor_values(3:6));
     % If we haven't reached any wall at all:
     if ~any(sensor_values(3:6) > WALL_DISTANCE) && ~wall_found
         % While there is no wall in front or to the right, simply go straight.
@@ -113,8 +113,9 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
         if sqrt(x_dist^2 + y_dist^2) > 30
             away_from_beginning = true;
         end
+        disp([x_dist y_dist theta]);
         % If we are very close to the origin and we're completing the lap:
-        if sqrt(x_dist^2 + y_dist^2) < 10 & away_from_beginning
+        if sqrt(x_dist^2 + y_dist^2) < 20 & away_from_beginning
             should_run = false;
             right_speed = 0;
             left_speed = 0;
