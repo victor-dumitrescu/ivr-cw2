@@ -62,6 +62,7 @@ while (wb_robot_step(TIME_STEP) ~= -1) & should_run
             error_values(i) = sensor_values(i) - reference(i);
         end
     end
+    disp(sensor_values(3:6));
     % If we haven't reached any wall at all:
     if ~any(sensor_values(3:6) > WALL_DISTANCE) && ~wall_found
         % While there is no wall in front or to the right, simply go straight.
